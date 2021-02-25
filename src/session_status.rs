@@ -91,7 +91,6 @@ pub fn fetch_session_status(
     client.set_header("Accept", "application/json")?;
 
     let data = client.get(());
-    println!("{:?}", data);
 
     if data.is_err() {
         // empty

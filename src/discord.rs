@@ -25,6 +25,11 @@ pub fn update(discord: &Rustcord, status: &PlaybackStatus) -> Result<(), std::ff
     )
 }
 
+pub fn clear(discord: &Rustcord) {
+    discord.run_callbacks();
+    discord.clear_presence();
+}
+
 pub fn initialize(app_id: String) -> Result<Rustcord, std::ffi::NulError> {
     Rustcord::init::<Handlers>(&app_id, true, None)
 }
