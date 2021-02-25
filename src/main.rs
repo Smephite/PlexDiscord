@@ -20,6 +20,7 @@ fn main() {
     let dc = discord::initialize(config.discord_app_id).unwrap();
 
     let mut was_ok = true;
+    let mut last_current: Option<session_status::PlaybackStatus> = None;
     println!("Starting Plex <-> Discord Rich Presence!");
     loop {
         let data = session_status::fetch_session_status(
@@ -27,17 +28,15 @@ fn main() {
             &config.plex_user,
             &config.plex_server,
         );
-        
-        if data.is_ok() {
 
+        if data.is_ok() {
             let data = data.unwrap();
 
-            
             if !was_ok {
                 println!("Updating Discord Rich Presence => {:?}", data);
             }
 
-            let res = discord::update(&dc, &data);
+            let res = discord::update(&dc, &data, &mut last_current);
             if res.is_err() {
                 println!("Failed to push to Discord! {:?}", res);
             }

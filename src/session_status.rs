@@ -64,7 +64,7 @@ impl RestPath<()> for SessionStatusBin {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct PlaybackStatus {
     pub state: String,
     pub series_title: String,

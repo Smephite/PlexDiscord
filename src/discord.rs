@@ -11,18 +11,36 @@ impl EventHandlers for Handlers {
     }
 }
 
-pub fn update(discord: &Rustcord, status: &PlaybackStatus) -> Result<(), std::ffi::NulError> {
+pub fn update(
+    discord: &Rustcord,
+    status: &PlaybackStatus,
+    last_status: &mut Option<PlaybackStatus>,
+) -> Result<(), std::ffi::NulError> {
     discord.run_callbacks();
 
-    discord.update_presence(
-        RichPresenceBuilder::new()
-            .state(&super::format::state(status))
-            .details(&super::format::details(status))
-            .end_time(SystemTime::now().add(Duration::from_millis(
-                (status.duration - status.current) as u64,
-            )))
-            .build(),
-    )
+    if status.state != "playing" {
+        *last_status = None;
+        return discord.update_presence(
+            RichPresenceBuilder::new()
+                .state(&super::format::state(status))
+                .details(&super::format::details(status))
+                .build(),
+        );
+    }
+    else if last_status.is_none() || last_status.clone().unwrap() != *status {
+        *last_status = Some(status.clone());
+        return discord.update_presence(
+            RichPresenceBuilder::new()
+                .state(&super::format::state(status))
+                .details(&super::format::details(status))
+                .end_time(SystemTime::now().add(Duration::from_millis(
+                    (status.duration - status.current) as u64,
+                )))
+                .build(),
+        );
+    }
+
+    Ok(())
 }
 
 pub fn clear(discord: &Rustcord) {
