@@ -35,10 +35,13 @@ fn main() {
             if !was_ok {
                 println!("Updating Discord Rich Presence => {:?}", data);
             }
-
-            let res = discord::update(&dc, &data, &mut last_current);
-            if res.is_err() {
-                println!("Failed to push to Discord! {:?}", res);
+            
+            if last_current != Some(data.clone()) {
+                last_current = Some(data.clone());
+                let res = discord::update(&dc, &data);
+                if res.is_err() {
+                    println!("Failed to push to Discord! {:?}", res);
+                }
             }
             was_ok = true;
         } else {
@@ -48,5 +51,6 @@ fn main() {
             discord::clear(&dc);
             was_ok = false;
         }
+        std::thread::sleep(std::time::Duration::from_millis(10000));
     }
 }

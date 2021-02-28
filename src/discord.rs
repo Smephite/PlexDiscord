@@ -14,12 +14,10 @@ impl EventHandlers for Handlers {
 pub fn update(
     discord: &Rustcord,
     status: &PlaybackStatus,
-    last_status: &mut Option<PlaybackStatus>,
 ) -> Result<(), std::ffi::NulError> {
     discord.run_callbacks();
 
     if status.state != "playing" {
-        *last_status = None;
         return discord.update_presence(
             RichPresenceBuilder::new()
                 .state(&super::format::state(status))
@@ -27,8 +25,7 @@ pub fn update(
                 .build(),
         );
     }
-    else if last_status.is_none() || last_status.clone().unwrap() != *status {
-        *last_status = Some(status.clone());
+    else {
         return discord.update_presence(
             RichPresenceBuilder::new()
                 .state(&super::format::state(status))
@@ -39,8 +36,6 @@ pub fn update(
                 .build(),
         );
     }
-
-    Ok(())
 }
 
 pub fn clear(discord: &Rustcord) {
